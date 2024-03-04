@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <table>
+        <tr valign="top">
+            <td><img src="{{ user.avatar(128) }}"></td>
+            <td><h1>User: {{ user.username }}</h1></td>
+        </tr>
+        <tr>
+            <td><h1>Account Number {{ account.account_no }}</h1></td>
+        </tr>
+        <tr>
+            <td><h1>Balance {{account.balance}} </h1></td>
+        </tr>
+    </table>
+    <hr>
+
+    <h2>Account Details:</h2>
+    <ul>
+        <li>City: {{ account.city }}</li>
+        <li>Mobile Number: {{ account.mob_no }}</li>
+        <li>Pancard Number: {{ account.pancard_no }}</li>
+        <li>Pincode: {{ account.pincode }}</li>
+        <li>Creation Time: {{ account.creation_time }}</li>
+        <li>Account Type: {{ account.account_type }}</li>
+    </ul>
+{% endblock %}
