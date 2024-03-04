@@ -38,3 +38,21 @@ class AccountForm(FlaskForm):
     pancard_no = StringField('Pancard Number', validators=[DataRequired()])
     account_type = SelectField('Account Type', choices=[('savings', 'Savings'), ('current', 'Current')], validators=[DataRequired()])
     submit = SubmitField('Create')
+
+class EditProfileForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    mob_no = StringField('Mobile Number', validators=[DataRequired()])
+    city = StringField('City', validators=[DataRequired()])
+    pincode = StringField('Pincode', validators=[DataRequired()])
+    submit = SubmitField('Create')
+
+    def __init__(self, original_username, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.original_username = original_username
+
+    def validate_username(self, username):
+        if username.data != self.original_username:
+            user = db.session.scalar(sa.select(User).where(
+                User.username == self.username.data))
+            if user is not None:
+                raise ValidationError('Please use a different username.')

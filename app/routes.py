@@ -1,6 +1,6 @@
 from app import app, db
 from flask import render_template, flash, redirect, url_for, request
-from app.forms import LoginForm, RegistrationForm, AccountForm
+from app.forms import LoginForm, RegistrationForm, AccountForm, EditProfileForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Account
 import sqlalchemy as sa
@@ -106,5 +106,22 @@ def user(username):
     account = db.first_or_404(sa.select(Account).where(Account.username==username))
     return render_template('user.html', user=user,account=account)
 
-
-
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    account =  db.first_or_404(sa.select(Account).where(Account.username==current_user.username))
+    form = EditProfileForm(current_user.username)
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        account.mob_no = form.mob_no.data
+        account.city = form.city.data
+        account.pincode = form.pincode.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('user',username=current_user.username))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.mob_no.data = account.mob_no
+        form.city.data = account.city
+        form.pincode.data = account.pincode
+    return render_template('edit_profile.html', title='Edit Profile', form=form)

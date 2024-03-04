@@ -12,8 +12,12 @@
         <tr>
             <td><h1>Balance {{account.balance}} </h1></td>
         </tr>
+        {% if user == current_user %}
+            <p><a href="{{ url_for('edit_profile') }}">Edit your profile</a></p>
+        {% endif %}
     </table>
     <hr>
+    
 
     <h2>Account Details:</h2>
     <ul>
