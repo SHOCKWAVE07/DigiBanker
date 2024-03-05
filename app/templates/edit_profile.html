@@ -1,37 +1,7 @@
 {% extends "base.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
 
 {% block content %}
     <h1>Edit Profile</h1>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
-            {% for error in form.username.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.mob_no.label }}<br>
-            {{ form.mob_no(cols=50, rows=4) }}<br>
-            {% for error in form.mob_no.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.city.label }}<br>
-            {{ form.city(cols=50, rows=4) }}<br>
-            {% for error in form.city.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.pincode.label }}<br>
-            {{ form.pincode(cols=50, rows=4) }}<br>
-            {% for error in form.pincode.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
+    {{ wtf.quick_form(form) }}
 {% endblock %}

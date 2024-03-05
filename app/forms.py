@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, PasswordField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from wtforms import StringField, BooleanField, PasswordField, SubmitField, SelectField, DecimalField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, NumberRange
 from app import db
 from app.models import User
 import sqlalchemy as sa
@@ -44,7 +44,7 @@ class EditProfileForm(FlaskForm):
     mob_no = StringField('Mobile Number', validators=[DataRequired()])
     city = StringField('City', validators=[DataRequired()])
     pincode = StringField('Pincode', validators=[DataRequired()])
-    submit = SubmitField('Create')
+    submit = SubmitField('Confirm')
 
     def __init__(self, original_username, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -56,3 +56,16 @@ class EditProfileForm(FlaskForm):
                 User.username == self.username.data))
             if user is not None:
                 raise ValidationError('Please use a different username.')
+
+class DepositForm(FlaskForm):
+    amount = DecimalField('Amount', validators=[DataRequired(), NumberRange(min=0.01)])
+    submit = SubmitField('Deposit')
+
+class WithdrawForm(FlaskForm):
+    amount = DecimalField('Amount', validators=[DataRequired(), NumberRange(min=0.01)])
+    submit = SubmitField('Withdraw')
+
+class TransferForm(FlaskForm):
+    amount = DecimalField('Amount', validators=[DataRequired(), NumberRange(min=0.01)])
+    receiver = StringField('To', validators=[DataRequired()])
+    submit = SubmitField('Transfer')

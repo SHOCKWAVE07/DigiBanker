@@ -1,11 +1,12 @@
 from app import app, db
 from flask import render_template, flash, redirect, url_for, request
-from app.forms import LoginForm, RegistrationForm, AccountForm, EditProfileForm
+from app.forms import LoginForm, RegistrationForm, AccountForm, EditProfileForm, DepositForm, WithdrawForm, TransferForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Account
 import sqlalchemy as sa
 from urllib.parse import urlsplit
 import random
+from decimal import Decimal
 
 @app.route('/')
 @app.route('/index')
@@ -125,3 +126,79 @@ def edit_profile():
         form.city.data = account.city
         form.pincode.data = account.pincode
     return render_template('edit_profile.html', title='Edit Profile', form=form)
+
+
+@app.route('/deposit', methods=['GET', 'POST'])
+@login_required
+def deposit():
+    form = DepositForm()
+    account =  db.first_or_404(sa.select(Account).where(Account.username==current_user.username))
+
+    if form.validate_on_submit():
+        amount = form.amount.data
+        past_amount = Decimal(account.balance)
+        account.balance = str(amount+past_amount)
+        db.session.commit()
+
+        flash(f'Successfully deposited {amount} into your account!')
+        return redirect(url_for('index'))
+
+    return render_template('deposit.html', form=form, title='Deposit')
+
+@app.route('/withdraw', methods=['GET', 'POST'])
+@login_required
+def withdraw():
+    form = WithdrawForm()
+    account =  db.first_or_404(sa.select(Account).where(Account.username==current_user.username))
+    if form.validate_on_submit():
+        amount = form.amount.data
+        past_amount = Decimal(account.balance)
+        # Check if the user has sufficient balance
+        if past_amount >= amount:
+            # Update the user's account balance
+            account.balance = str(past_amount-amount)
+            db.session.commit()
+
+            flash(f'Successfully withdrew {amount} from your account!')
+            return redirect(url_for('index'))
+        else:
+            flash('Insufficient funds')
+
+    return render_template('withdraw.html', form=form, title='Withdraw')
+
+@app.route('/transfer', methods=['GET', 'POST'])
+@login_required
+def transfer():
+    form = TransferForm()
+
+    if form.validate_on_submit():
+        amount = form.amount.data
+        receiver_username = form.receiver.data
+
+        # Check if the receiver exists
+        receiver = User.query.filter_by(username=receiver_username).first()
+        if not receiver:
+            flash('Receiver not found. Please check the username.')
+            return redirect(url_for('transfer'))
+
+        # Check if the sender has sufficient balance
+        sender_account = Account.query.filter_by(username=current_user.username).first()
+        sender_balance = Decimal(sender_account.balance)
+
+        if sender_balance >= amount:
+            # Update the sender's account balance
+            sender_account.balance = str(sender_balance - amount)
+
+            # Update the receiver's account balance
+            receiver_account = Account.query.filter_by(username=receiver_username).first()
+            receiver_balance = Decimal(receiver_account.balance)
+            receiver_account.balance = str(receiver_balance + amount)
+
+            db.session.commit()
+
+            flash(f'Successfully transferred {amount} to {receiver_username}!')
+            return redirect(url_for('index'))
+        else:
+            flash('Insufficient funds')
+
+    return render_template('transfer.html', form=form, title='Transfer')
