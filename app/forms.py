@@ -5,6 +5,7 @@ from app import db
 from app.models import User
 import sqlalchemy as sa
 
+
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -36,7 +37,7 @@ class AccountForm(FlaskForm):
     city = StringField('City', validators=[DataRequired()])
     pincode = StringField('Pincode', validators=[DataRequired()])
     pancard_no = StringField('Pancard Number', validators=[DataRequired()])
-    account_type = SelectField('Account Type', choices=[('savings', 'Savings'), ('current', 'Current')], validators=[DataRequired()])
+    account_type = SelectField('Account Type', choices=[('Savings', 'Savings'), ('Current', 'Current')], validators=[DataRequired()])
     submit = SubmitField('Create')
 
 class EditProfileForm(FlaskForm):

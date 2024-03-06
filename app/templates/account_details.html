@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
+
+{% block content%}
+
+<div class="card my-card">
+    <div class="card-header">
+        <h2>Servies</h2>
+    </div>
+    <div class="card-body">
+        <a class="nav-link" aria-current="page" href="{{ url_for('deposit') }}">Deposit</a>
+        <a class="nav-link" aria-current="page" href="{{ url_for('withdraw') }}">Withdraw</a>
+        <a class="nav-link" aria-current="page" href="{{ url_for('transfer') }}">Transfer</a>
+        <a class="nav-link" aria-current="page" href="{{ url_for('transaction_history') }}">Transaction History</a>
+    </div>
+</div>
+
+<style>
+    .my-card {
+    margin-bottom: 20px;
+    border: 1px solid #239feb;
+    background-color: rgb(246, 246, 183);
+    border-radius: 10px;
+    transition: transform 0.3s ease-in-out;
+}
+</style>
+
+{% endblock %}
+
+

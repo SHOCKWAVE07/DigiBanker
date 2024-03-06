@@ -12,8 +12,7 @@
             <td><h2>Balance: {{account.balance}} </h2></td>
         </tr>
         {% if user == current_user %}
-            <a class="nav-link" aria-current="page" href="{{ url_for('edit_profile') }}">Edit your profile</a>
-            <!-- <p><a href="{{ url_for('edit_profile') }}">Edit your profile</a></p> -->
+            <button type="button" class="btn btn-warning"><a class="nav-link" aria-current="page" href="{{ url_for('edit_profile') }}">Edit your profile</a></button>
         {% endif %}
     </table>
     <hr>

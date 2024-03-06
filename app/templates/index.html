@@ -3,11 +3,39 @@
 
 {% block content%}
 
-<h1> Hi, {{current_user.username }} !</h1>
+<h3>Welcome {{current_user.username}}</h3>
 
-<a class="nav-link" aria-current="page" href="{{ url_for('deposit') }}">Deposit</a>
-<a class="nav-link" aria-current="page" href="{{ url_for('withdraw') }}">Withdraw</a>
-<a class="nav-link" aria-current="page" href="{{ url_for('transfer') }}">Transfer</a>
-<a class="nav-link" aria-current="page" href="{{ url_for('transaction_history') }}">Transaction History</a>
+<div class="row">
+    <div class="col-md-4">
+        <a href="{{ url_for('account_details', account_no=account.account_no) }}" class="card-link">
+            <div class="card my-card">
+                <div class="card-header">
+                    <h3>{{account.account_type}} Account</h3>
+                </div>
+                <div class="card-body">
+                    <h4>Account Number: {{ account.account_no }}</h4>
+                    <h4>Balance: {{ account.balance }}</h4>
+                </div>
+            </div>
+        </a>
+    </div>
+
+
+<style>
+    a {
+    text-decoration: none;
+    }
+    .my-card {
+        margin-bottom: 20px;
+        border: 1px solid #239feb;
+        background-color: rgb(246, 246, 183);
+        border-radius: 10px;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .my-card:hover {
+        transform: scale(1.05);
+    }
+</style>
 
 {% endblock %}

@@ -1,5 +1,5 @@
 from app import app, db
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, current_app
 from app.forms import LoginForm, RegistrationForm, AccountForm, EditProfileForm, DepositForm, WithdrawForm, TransferForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Account, Transaction
@@ -8,11 +8,14 @@ from urllib.parse import urlsplit
 import random
 from decimal import Decimal
 
+
+
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
-    return render_template('index.html',title='Home')
+    account = db.first_or_404(sa.select(Account).where(Account.username==current_user.username))
+    return render_template('index.html',title='Home',account=account)
 
 
 @app.route('/login', methods=['GET','POST'])
@@ -197,10 +200,11 @@ def transfer():
         sender_account = Account.query.filter_by(username=current_user.username).first()
         sender_balance = Decimal(sender_account.balance)
 
+    
+
         if sender_balance >= amount:
             # Update the sender's account balance
             sender_account.balance = str(sender_balance - amount)
-
             # Update the receiver's account balance
             receiver_account = Account.query.filter_by(username=receiver_username).first()
             receiver_balance = Decimal(receiver_account.balance)
@@ -211,9 +215,7 @@ def transfer():
             amount=str(amount)
             )
             db.session.add(transaction)
-
             db.session.commit()
-
             flash(f'Successfully transferred {amount} to {receiver_username}!')
             return redirect(url_for('index'))
         else:
@@ -231,3 +233,8 @@ def transaction_history():
     ).order_by(Transaction.timestamp.desc()).all()
 
     return render_template('transaction_history.html', transactions=transactions, title='Transaction History')
+
+@app.route('/account_details')
+def account_details():
+    account =  db.first_or_404(sa.select(Account).where(Account.username==current_user.username))
+    return render_template('account_details.html')
