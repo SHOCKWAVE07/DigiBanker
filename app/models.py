@@ -49,3 +49,14 @@ class Account(db.Model):
 @login.user_loader
 def load_user(id):
     return db.session.get(User,int(id))
+
+class Transaction(db.Model):
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    sender_username = sa.Column(sa.String(64), sa.ForeignKey(User.username), nullable=False)
+    receiver_username = sa.Column(sa.String(64), nullable=False)
+    amount = sa.Column(sa.String, nullable=False)
+    timestamp = sa.Column(sa.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Transaction {self.id}>'

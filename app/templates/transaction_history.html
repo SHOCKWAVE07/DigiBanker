@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Sender/Receiver</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.timestamp }}</td>
+                    <td>{{ transaction.amount }}</td>
+                    <td>
+                        {% if transaction.sender_username == current_user.username %}
+                            Sent to {{ transaction.receiver_username }}
+                        {% elif transaction.receiver_username == current_user.username %}
+                            Received from {{ transaction.sender_username }}
+                        {% else %}
+                            Internal transaction
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

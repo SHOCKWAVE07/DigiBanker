@@ -2,7 +2,7 @@ from app import app, db
 from flask import render_template, flash, redirect, url_for, request
 from app.forms import LoginForm, RegistrationForm, AccountForm, EditProfileForm, DepositForm, WithdrawForm, TransferForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Account
+from app.models import User, Account, Transaction
 import sqlalchemy as sa
 from urllib.parse import urlsplit
 import random
@@ -138,6 +138,12 @@ def deposit():
         amount = form.amount.data
         past_amount = Decimal(account.balance)
         account.balance = str(amount+past_amount)
+        transaction = Transaction(
+            sender_username=current_user.username,
+            receiver_username=current_user.username,  # Deposit into own account
+            amount=str(amount)
+        )
+        db.session.add(transaction)
         db.session.commit()
 
         flash(f'Successfully deposited {amount} into your account!')
@@ -157,6 +163,12 @@ def withdraw():
         if past_amount >= amount:
             # Update the user's account balance
             account.balance = str(past_amount-amount)
+            transaction = Transaction(
+            sender_username=current_user.username,
+            receiver_username=current_user.username,  # Deposit into own account
+            amount=str(amount)
+            )
+            db.session.add(transaction)
             db.session.commit()
 
             flash(f'Successfully withdrew {amount} from your account!')
@@ -193,6 +205,12 @@ def transfer():
             receiver_account = Account.query.filter_by(username=receiver_username).first()
             receiver_balance = Decimal(receiver_account.balance)
             receiver_account.balance = str(receiver_balance + amount)
+            transaction = Transaction(
+            sender_username=current_user.username,
+            receiver_username=receiver_account.username,  # Deposit into own account
+            amount=str(amount)
+            )
+            db.session.add(transaction)
 
             db.session.commit()
 
@@ -202,3 +220,14 @@ def transfer():
             flash('Insufficient funds')
 
     return render_template('transfer.html', form=form, title='Transfer')
+
+@app.route('/transaction_history')
+def transaction_history():
+
+    # Assuming you have a relationship between User and Account
+    transactions = db.session.query(Transaction).filter(
+        (Transaction.sender_username == current_user.username) |
+        (Transaction.receiver_username == current_user.username)
+    ).order_by(Transaction.timestamp.desc()).all()
+
+    return render_template('transaction_history.html', transactions=transactions, title='Transaction History')
